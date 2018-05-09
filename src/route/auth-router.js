@@ -1,8 +1,10 @@
 'use strict';
 
-import { Router } from 'express';
 import { json } from 'body-parser';
+import { Router } from 'express';
+import HttpError from 'http-errors';
 import Account from '../model/user-account';
+import basicAuthMiddleware from '../lib/basic-auth-middleware';
 import logger from '../lib/logger';
 
 const authRouter = new Router();
@@ -20,6 +22,16 @@ authRouter.post('/signup', jsonParser, (request, response, next) => {
       return response.json({ token });
     })
     .catch(next);
+});
+
+authRouter.get('/login', basicAuthMiddleware, (request, response, next) => {
+  if (!request.account) return next(new HttpError(400, 'Auth- invalid request'))
+  return request.account.pCreateToken()
+    .then((token) => {
+      logger.log(logger.INFO, 'Responding with 200 status and Token');
+      return response.json({ token });
+    })
+    .catch(next)
 });
 
 export default authRouter;

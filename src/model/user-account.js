@@ -5,7 +5,7 @@ import hash from 'bcrypt';
 import encrypt from 'crypto';
 import jsonWebToken from 'jsonwebtoken';
 
-const HAS_ROUNDS = 16;
+const HASH_ROUNDS = 16;
 const TOKEN_SEED_LENGTH = 128;
 
 const accountSchema = mongoose.Schema({
@@ -29,6 +29,16 @@ const accountSchema = mongoose.Schema({
   },
 });
 
+function pVerifyPassword (password) {
+    return bcrypt.compare(password, this.passwordHash)
+      .then((result) => {
+        if (!result) {
+          throw new HttpError(400, 'AUTH - incorrect data');
+        }
+        return this;
+      });
+  }
+
 function pCreateToken() {
   this.tokenSeed = encrypt.randomBytes(TOKEN_SEED_LENGTH).toString('hex');
   return this.save()
@@ -41,11 +51,12 @@ function pCreateToken() {
 }
 
 accountSchema.methods.pCreateToken = pCreateToken;
+accountSchema.methods.pVerifyPassword = pVerifyPassword;
 
 const Account = mongoose.model('userAccount', accountSchema); 
 
 Account.create = (email, username, password) => {
-  return hash.hash(password, HAS_ROUNDS)
+  return hash.hash(password, HASH_ROUNDS)
     .then((passwordHash) => {
       password = null; /* eslint-disable-line */
       const tokenSeed = encrypt.randomBytes(TOKEN_SEED_LENGTH).toString('hex');

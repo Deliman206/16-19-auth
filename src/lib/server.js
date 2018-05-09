@@ -6,12 +6,14 @@ import logger from './logger';
 import authRoutes from '../route/auth-router';
 import loggerMiddleware from './logger-middleware';
 import errorMiddleware from './error-middleware';
+import profileRoute from '../route/profile-route';
 
 const app = express();
 let server = null;
 
 app.use(loggerMiddleware);
 app.use(authRoutes);
+app.use(profileRoute);
 app.all('*', (request, response) => {
   logger.log(logger.INFO, 'Returning 404 for catch-all route');
   return response.sendStatus(404);
