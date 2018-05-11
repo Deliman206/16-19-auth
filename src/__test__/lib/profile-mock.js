@@ -1,22 +1,24 @@
 'use strict';
 
 import faker from 'faker';
-import Profile from '../../model/profile-model';
-import { pCreateAccountMock, pRemoveAccountMock } from './user-account-mock';
+import Profile from '../../model/profile';
+import { pCreateAccountMock, pRemoveAccountMock } from './account-mock';
+
 
 const pCreateProfileMock = () => {
   const resultMock = {};
 
   return pCreateAccountMock()
-    .then((accountSetMock) => {
-      resultMock.accountSetMock = accountSetMock; // save information into result
+    .then((accountMock) => {
+      resultMock.accountMock = accountMock;
 
       return new Profile({
-        bio: faker.lorem.words(10),
+        bio: faker.lorem.words(100),
         avatar: faker.random.image(),
         lastName: faker.name.lastName(),
-        firstName: faker.name.lastName(),
-        account: accountSetMock.account._id, // Sets up the relationship
+        firstName: faker.name.firstName(),
+
+        account: accountMock.account._id,
       }).save();
     })
     .then((profile) => {
@@ -24,6 +26,12 @@ const pCreateProfileMock = () => {
       return resultMock;
     });
 };
-const pRemoveProfileMock = () => { return Promise.all([Profile.remove({}), pRemoveAccountMock(),])};
 
-export default { pCreateProfileMock, pRemoveProfileMock }
+const pRemoveProfileMock = () => {
+  return Promise.all([
+    Profile.remove({}),
+    pRemoveAccountMock(),
+  ]);
+};
+
+export { pCreateProfileMock, pRemoveProfileMock };
