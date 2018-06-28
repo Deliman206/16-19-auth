@@ -8,6 +8,8 @@ if (!process.env.NODE_ENV) {
 
 if (process.env.NODE_ENV !== 'production') {
   require('babel-register');
+} else if (process.env.NODE_ENV === 'production') {
+  require('babel-register');
 }
 
 require('./src/main');
