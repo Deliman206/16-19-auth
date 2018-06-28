@@ -9,6 +9,7 @@ const authRouter = new Router();
 const jsonParser = json();
 
 authRouter.post('/signup', jsonParser, (request, response, next) => { 
+  logger.log(logger.INFO, `Request Information ${request}`);
   return Account.create(request.body.email, request.body.username, request.body.password)
     .then((account) => {
       delete request.body.password;

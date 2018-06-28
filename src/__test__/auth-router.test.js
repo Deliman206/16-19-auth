@@ -6,7 +6,6 @@ import { pRemoveAccountMock } from './lib/user-account-mock';
 
 
 const apiURL = `http://localhost:${process.env.PORT}/signup`;
-jest.setTimeout(10000);
 
 describe('AUTH Router', () => {
   beforeAll(startServer);
